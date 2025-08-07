@@ -1,0 +1,14 @@
+{
+  "build_time": "2025-08-07T03:55:23.690599",
+  "version": "1.0.0",
+  "files": [
+    "index.html",
+    "contact.html",
+    "images/picture1.jpg",
+    "images/picture2.jpg",
+    "images/Headshot.jpg",
+    "images/picture3.jpg",
+    "js/main.js",
+    "css/style.css"
+  ]
+}

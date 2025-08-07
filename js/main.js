@@ -1,0 +1,345 @@
+/**
+ * PersonalCV - Modern Interactive Features
+ * Adds animations, dark mode, smooth scrolling, and enhanced interactivity
+ */
+
+class PersonalCV {
+    constructor() {
+        this.initializeTheme();
+        this.initializeAnimations();
+        this.initializeSmoothScrolling();
+        this.initializeTypingEffect();
+        this.initializeSkillBars();
+        this.initializeParticles();
+        this.initializeScrollEffects();
+        this.initializeContactForm();
+    }
+
+    // Theme Management
+    initializeTheme() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                // Update icon
+                const icon = themeToggle.querySelector('i');
+                icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            });
+        }
+    }
+
+    // Smooth Scrolling Navigation
+    initializeSmoothScrolling() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    }
+
+    // Typing Effect for Hero Section
+    initializeTypingEffect() {
+        const typingElement = document.getElementById('typing-text');
+        if (!typingElement) return;
+
+        const texts = [
+            'Computer Science Student',
+            'Data Science Enthusiast',
+            'Software Developer',
+            'AI/ML Engineer',
+            'Problem Solver'
+        ];
+        
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        
+        function type() {
+            const currentText = texts[textIndex];
+            
+            if (isDeleting) {
+                typingElement.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingElement.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+            }
+            
+            let timeout = isDeleting ? 50 : 100;
+            
+            if (!isDeleting && charIndex === currentText.length) {
+                timeout = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                textIndex = (textIndex + 1) % texts.length;
+            }
+            
+            setTimeout(type, timeout);
+        }
+        
+        type();
+    }
+
+    // Animated Skill Bars
+    initializeSkillBars() {
+        const skillBars = document.querySelectorAll('.skill-bar');
+        
+        const animateSkillBars = () => {
+            skillBars.forEach(bar => {
+                const percentage = bar.getAttribute('data-percentage');
+                const fill = bar.querySelector('.skill-fill');
+                if (fill) {
+                    fill.style.width = percentage + '%';
+                }
+            });
+        };
+
+        // Use Intersection Observer to trigger animation when visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setTimeout(animateSkillBars, 500);
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        const skillsSection = document.getElementById('skills');
+        if (skillsSection) {
+            observer.observe(skillsSection);
+        }
+    }
+
+    // Particle Background Animation
+    initializeParticles() {
+        const canvas = document.getElementById('particles-canvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createParticle() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: (Math.random() - 0.5) * 2,
+                speedY: (Math.random() - 0.5) * 2,
+                opacity: Math.random() * 0.5 + 0.2
+            };
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push(createParticle());
+            }
+        }
+
+        function updateParticles() {
+            particles.forEach(particle => {
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+
+                if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
+                if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
+            });
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${particle.opacity})`;
+                ctx.fill();
+            });
+
+            // Draw connections
+            particles.forEach((particle, i) => {
+                particles.slice(i + 1).forEach(otherParticle => {
+                    const distance = Math.sqrt(
+                        Math.pow(particle.x - otherParticle.x, 2) +
+                        Math.pow(particle.y - otherParticle.y, 2)
+                    );
+
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(particle.x, particle.y);
+                        ctx.lineTo(otherParticle.x, otherParticle.y);
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.1 * (1 - distance / 100)})`;
+                        ctx.stroke();
+                    }
+                });
+            });
+        }
+
+        function animate() {
+            updateParticles();
+            drawParticles();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        resizeCanvas();
+        initParticles();
+        animate();
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
+    }
+
+    // Scroll Effects and Animations
+    initializeScrollEffects() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections and cards
+        document.querySelectorAll('section, .card, .timeline-item').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.splash');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+    }
+
+    // Enhanced Contact Form
+    initializeContactForm() {
+        const form = document.getElementById('contact-form');
+        if (!form) return;
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const message = formData.get('message');
+
+            // Simple validation
+            if (!name || !email || !message) {
+                this.showNotification('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (!this.isValidEmail(email)) {
+                this.showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+
+            // Simulate form submission
+            this.showNotification('Thank you! Your message has been sent.', 'success');
+            form.reset();
+        });
+    }
+
+    isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    // Initialize everything
+    initializeAnimations() {
+        // Add stagger animation to cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new PersonalCV();
+});
+
+// Add some utility functions
+window.PersonalCVUtils = {
+    // Download CV as PDF (placeholder for future implementation)
+    downloadCV: () => {
+        alert('CV download feature coming soon!');
+    },
+    
+    // Copy email to clipboard
+    copyEmail: () => {
+        navigator.clipboard.writeText('azj21737@uga.edu').then(() => {
+            alert('Email copied to clipboard!');
+        });
+    },
+    
+    // Share profile
+    shareProfile: () => {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Adam Jahani - Personal CV',
+                text: 'Check out Adam Jahani\'s professional CV',
+                url: window.location.href
+            });
+        } else {
+            // Fallback: copy URL to clipboard
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Profile URL copied to clipboard!');
+            });
+        }
+    }
+};
