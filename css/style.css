@@ -1403,3 +1403,70 @@ h2::after {
         align-items: center;
     }
 }
+
+/* Summary of Qualifications Section */
+.qualifications-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.qualification-item {
+    background: var(--card-background);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.qualification-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.qualification-icon {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.qualification-content h3 {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+}
+
+.qualification-content p {
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .qualifications-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .qualification-item {
+        padding: 20px;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .qualification-icon {
+        margin: 0 auto 15px;
+    }
+}
